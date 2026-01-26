@@ -2,6 +2,8 @@ ARG ROS_DISTRO=humble
 FROM osrf/ros:${ROS_DISTRO}-desktop
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+ENV ROS_DOMAIN_ID=0
 
 RUN apt update && apt install -y software-properties-common && \
     add-apt-repository universe && \
@@ -28,6 +30,7 @@ RUN apt update && apt install -y \
     ros-${ROS_DISTRO}-diagnostics \
     ros-${ROS_DISTRO}-vision-opencv \
     ros-${ROS_DISTRO}-image-transport \
+    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
     && rm -rf /var/lib/apt/lists/*
 
 # Orbbec SDK v2
@@ -53,6 +56,7 @@ RUN bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && \
 RUN bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && \
     colcon build --symlink-install"
 
+COPY fastrtps_profile.xml /tmp/fastrtps_profile.xml
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
